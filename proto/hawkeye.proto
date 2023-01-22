@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package hawkeye;
+
+service HawkeyeService {
+	rpc GetCpuStats(CpuStatsRequest) returns (CpuStatsResponse) {}
+}
+
+message CpuStatsRequest {
+	int32 time = 1;
+}
+
+message CpuStatsResponse {
+	float idle = 1;
+}
