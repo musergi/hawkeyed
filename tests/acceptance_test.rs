@@ -22,7 +22,7 @@ async fn fetch_cpu_stats() -> Result<(), Box<dyn std::error::Error>> {
     let mut client = HawkeyeServiceClient::connect("http://[::1]:50051").await?;
     let request = tonic::Request::new(CpuStatsRequest { time: 1 });
     let response = client.get_cpu_stats(request).await?;
-    assert!(response.get_ref().idle > 0.0);
-    assert!(response.get_ref().idle < 1.0);
+    assert!(response.get_ref().ocupation > 0.0);
+    assert!(response.get_ref().ocupation < 1.0);
     Ok(())
 }

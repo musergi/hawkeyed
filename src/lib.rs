@@ -17,12 +17,12 @@ impl HawkeyeServiceImpl {
         HawkeyeServiceImpl { system }
     }
 
-    fn cpu_idle(&self) -> Option<f32> {
+    fn cpu_ocupation(&self) -> Option<f32> {
         match self.system.cpu_load_aggregate() {
             Ok(cpu) => {
                 thread::sleep(Duration::from_secs(1));
                 match cpu.done() {
-                    Ok(cpu) => Some(cpu.idle),
+                    Ok(cpu) => Some(1.0 - cpu.idle),
                     Err(_) => None,
                 }
             }
@@ -35,10 +35,10 @@ impl HawkeyeServiceImpl {
 impl HawkeyeService for HawkeyeServiceImpl {
     async fn get_cpu_stats(
         &self,
-        request: Request<CpuStatsRequest>,
+        _request: Request<CpuStatsRequest>,
     ) -> Result<Response<CpuStatsResponse>, Status> {
         let cpu_stats_response = CpuStatsResponse {
-            idle: self.cpu_idle().unwrap(),
+            ocupation: self.cpu_ocupation().unwrap(),
         };
         Ok(Response::new(cpu_stats_response))
     }

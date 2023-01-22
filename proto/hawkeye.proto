@@ -11,5 +11,5 @@ message CpuStatsRequest {
 }
 
 message CpuStatsResponse {
-	float idle = 1;
+	float ocupation = 1;
 }
