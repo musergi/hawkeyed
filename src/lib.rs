@@ -43,3 +43,5 @@ impl HawkeyeService for HawkeyeServiceImpl {
         Ok(Response::new(cpu_stats_response))
     }
 }
+
+pub mod stats;
