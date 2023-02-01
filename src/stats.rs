@@ -1,17 +1,20 @@
+use async_trait::async_trait;
+
+#[async_trait]
 trait StatsReader {
-	async fn cpu_stats() -> CpuStats;
+    async fn cpu_stats() -> CpuStats;
 }
 
-struct CpuStats {
-	cpus: Vec<CpuInfo>,
+pub struct CpuStats {
+    pub cpus: Vec<CpuInfo>,
 }
 
-struct CpuInfo {
-	user: u64,
-	nice: u64,
-	system: u64,
-	idle: u64,
-	iowait: u64,
-	irq: u64,
-	softirq: u64,
+pub struct CpuInfo {
+    pub user: u64,
+    pub nice: u64,
+    pub system: u64,
+    pub idle: u64,
+    pub iowait: u64,
+    pub irq: u64,
+    pub softirq: u64,
 }
