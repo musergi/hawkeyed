@@ -236,4 +236,14 @@ mod tests {
     fn parse_cpu_bad_num() {
         assert!("cpuA".parse::<CpuPrefix>().is_err());
     }
+
+    #[test]
+    fn parse_double_whitespace() {
+        let v = "cpu  840062 638 134704 413417328 84836 0 8422 0 0 0"
+            .parse::<StatLine>()
+            .unwrap();
+        if let StatLine::CpuAggregate(v) = v {
+            assert_eq!(v.user, 840062);
+        }
+    }
 }
