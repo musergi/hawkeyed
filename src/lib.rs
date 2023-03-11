@@ -63,21 +63,21 @@ impl std::str::FromStr for CpuPrefix {
 
 #[derive(Debug, PartialEq, Eq)]
 pub struct CpuMetric {
-    pub user: u32,
-    pub nice: u32,
-    pub system: u32,
-    pub idle: u32,
-    pub iowait: u32,
-    pub irq: u32,
-    pub softirq: u32,
+    pub user: u64,
+    pub nice: u64,
+    pub system: u64,
+    pub idle: u64,
+    pub iowait: u64,
+    pub irq: u64,
+    pub softirq: u64,
 }
 
 impl CpuMetric {
-    fn consume<'a>(iter: &mut impl Iterator<Item = &'a str>) -> Result<u32, CpuMetricParseError> {
+    fn consume<'a>(iter: &mut impl Iterator<Item = &'a str>) -> Result<u64, CpuMetricParseError> {
         Ok(iter
             .next()
             .ok_or(CpuMetricParseError::MissingField)?
-            .parse::<u32>()?)
+            .parse::<u64>()?)
     }
 
     fn build<'a>(

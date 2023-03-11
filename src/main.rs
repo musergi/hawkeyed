@@ -27,11 +27,11 @@ async fn main() {
 }
 
 fn report_metrics(prefix: &str, metrics: CpuMetric) {
-    absolute_counter!(format!("{}_{}", prefix, "user"), metrics.user as u64);
-    absolute_counter!(format!("{}_{}", prefix, "nice"), metrics.nice as u64);
-    absolute_counter!(format!("{}_{}", prefix, "system"), metrics.system as u64);
-    absolute_counter!(format!("{}_{}", prefix, "idle"), metrics.idle as u64);
-    absolute_counter!(format!("{}_{}", prefix, "iowait"), metrics.iowait as u64);
-    absolute_counter!(format!("{}_{}", prefix, "irq"), metrics.irq as u64);
-    absolute_counter!(format!("{}_{}", prefix, "softirq"), metrics.softirq as u64);
+    absolute_counter!(format!("{}_{}", prefix, "user"), metrics.user);
+    absolute_counter!(format!("{}_{}", prefix, "nice"), metrics.nice);
+    absolute_counter!(format!("{}_{}", prefix, "system"), metrics.system);
+    absolute_counter!(format!("{}_{}", prefix, "idle"), metrics.idle);
+    absolute_counter!(format!("{}_{}", prefix, "iowait"), metrics.iowait);
+    absolute_counter!(format!("{}_{}", prefix, "irq"), metrics.irq);
+    absolute_counter!(format!("{}_{}", prefix, "softirq"), metrics.softirq);
 }
