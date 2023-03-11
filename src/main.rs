@@ -17,8 +17,8 @@ async fn main() {
             .filter_map(|line| line.parse::<StatLine>().ok());
         for stat in stats {
             match stat {
-                StatLine::CpuAggregate(metrics) => report_metrics("cpu", metrics),
-                _ => (),
+                StatLine::CpuAggregate(metrics) => report_metrics("agg", metrics),
+                StatLine::Cpu(n, metrics) => report_metrics(&n.to_string(), metrics),
             }
         }
         println!("Writen metric");
@@ -27,11 +27,12 @@ async fn main() {
 }
 
 fn report_metrics(prefix: &str, metrics: CpuMetric) {
-    absolute_counter!(format!("{}_{}", prefix, "user"), metrics.user);
-    absolute_counter!(format!("{}_{}", prefix, "nice"), metrics.nice);
-    absolute_counter!(format!("{}_{}", prefix, "system"), metrics.system);
-    absolute_counter!(format!("{}_{}", prefix, "idle"), metrics.idle);
-    absolute_counter!(format!("{}_{}", prefix, "iowait"), metrics.iowait);
-    absolute_counter!(format!("{}_{}", prefix, "irq"), metrics.irq);
-    absolute_counter!(format!("{}_{}", prefix, "softirq"), metrics.softirq);
+    let label = [("cpu_id", format!("{}", prefix))];
+    absolute_counter!("cpu_user", metrics.user, &label);
+    absolute_counter!("cpu_nice", metrics.nice, &label);
+    absolute_counter!("cpu_system", metrics.system, &label);
+    absolute_counter!("cpu_idle", metrics.idle, &label);
+    absolute_counter!("cpu_iowait", metrics.iowait, &label);
+    absolute_counter!("cpu_irq", metrics.irq, &label);
+    absolute_counter!("cpu_softirq", metrics.softirq, &label);
 }
