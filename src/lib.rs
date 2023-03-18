@@ -127,6 +127,68 @@ impl From<ParseIntError> for CpuMetricParseError {
     }
 }
 
+#[derive(Debug)]
+pub enum MemoryLine {
+    Free(u64),
+    Total(u64),
+}
+
+impl MemoryLine {
+    fn parse_value(prefix: &'static str, v: Option<&str>) -> Result<u64, MemoryLineParseError> {
+        Ok(v.ok_or(MemoryLineParseError::MissingValue(prefix))?
+            .strip_suffix("kB")
+            .ok_or(MemoryLineParseError::MissingUnitSuffix(prefix))?
+            .trim()
+            .parse::<u64>()
+            .map_err(|err| MemoryLineParseError::ValueParseError(prefix, err))?)
+    }
+}
+
+impl std::str::FromStr for MemoryLine {
+    type Err = MemoryLineParseError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let mut parts = s.split(":");
+        let prefix = parts.next().ok_or(MemoryLineParseError::NoPrefix)?;
+        match prefix {
+            "MemTotal" => Ok(MemoryLine::Total(Self::parse_value(
+                "MemTotal",
+                parts.next(),
+            )?)),
+            "MemFree" => Ok(MemoryLine::Free(Self::parse_value(
+                "MemFree",
+                parts.next(),
+            )?)),
+            prefix => Err(MemoryLineParseError::UnkownPrefix(prefix.to_string())),
+        }
+    }
+}
+
+#[derive(Debug)]
+pub enum MemoryLineParseError {
+    NoPrefix,
+    UnkownPrefix(String),
+    MissingValue(&'static str),
+    ValueParseError(&'static str, ParseIntError),
+    MissingUnitSuffix(&'static str),
+}
+
+impl std::fmt::Display for MemoryLineParseError {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        match self {
+            MemoryLineParseError::NoPrefix => write!(f, "line with no prefix"),
+            MemoryLineParseError::UnkownPrefix(prefix) => write!(f, "unkown prefix: {}", prefix),
+            MemoryLineParseError::MissingValue(key) => write!(f, "no value for {}", key),
+            MemoryLineParseError::ValueParseError(key, err) => {
+                write!(f, "could not parse value for {}: {}", key, err)
+            }
+            MemoryLineParseError::MissingUnitSuffix(key) => write!(f, "no unit for {}", key),
+        }
+    }
+}
+
+impl std::error::Error for MemoryLineParseError {}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -244,6 +306,36 @@ mod tests {
             .unwrap();
         if let StatLine::CpuAggregate(v) = v {
             assert_eq!(v.user, 840062);
+        } else {
+            panic!("bad line variation")
+        }
+    }
+
+    #[test]
+    fn parse_memory_total() {
+        let v = "MemTotal:        8114112 kB".parse::<MemoryLine>().unwrap();
+        match v {
+            MemoryLine::Total(v) => assert_eq!(v, 8114112),
+            _ => panic!("bad variant"),
+        }
+    }
+
+    #[test]
+    fn parse_value_err() {
+        assert!("MemTotal:        81AA112 kB".parse::<MemoryLine>().is_err());
+    }
+
+    #[test]
+    fn parse_bad_suffix_err() {
+        assert!("MemTotal:        8114112 B".parse::<MemoryLine>().is_err());
+    }
+
+    #[test]
+    fn parse_memory_free() {
+        let v = "MemFree:        8114112 kB".parse::<MemoryLine>().unwrap();
+        match v {
+            MemoryLine::Free(v) => assert_eq!(v, 8114112),
+            _ => panic!("bad variant"),
         }
     }
 }
